@@ -4,9 +4,18 @@
 
 {% block content %}
     <h1 class="mb-5">Tags:</h1>
-    {% for tag in tags %}
-    <a href="{{ tag.get_absolute_url }}">
-        {{ tag.title }}
-    </a>
-    {% endfor %}
+    <div class="card" style="width: 18rem;">
+        <ul class="list-group list-group-flush">
+            {% for tag in tags %}
+                <li class="list-group-item"><a href="{{ tag.get_absolute_url }}">{{ tag.title|title }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+<!--    {% for tag in tags %}-->
+<!--        <div class="card">-->
+<!--            <div class="card-body">-->
+<!--                <a href="{{ tag.get_absolute_url }}">{{ tag.title|title }}</a>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    {% endfor %}-->
 {% endblock %}
