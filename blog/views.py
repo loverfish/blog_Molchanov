@@ -3,13 +3,27 @@ from django.views.generic import View, CreateView
 from django.urls import reverse_lazy
 
 from .models import Post, Tag
-from .forms import TagForm
+from .forms import TagForm, PostForm
 from .utlils import ObjectDetailMixin
 
 
 class PostDetail(ObjectDetailMixin, View):
     model = Post
     template = 'blog/post_detail.html'
+
+
+class PostCreate(View):
+    def get(self, request):
+        form = PostForm()
+        return render(request, 'blog/post_create.html', context={'form': form})
+
+    def post(self, request):
+        bound_form = PostForm(request.POST)
+
+        if bound_form.is_valid():
+            new_post = bound_form.save()
+            return redirect(new_post)
+        return render(request, 'blog/post_create.html', context={'form': bound_form})
 
 
 class TagDetail(ObjectDetailMixin, View):
