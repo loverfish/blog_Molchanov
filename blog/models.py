@@ -11,7 +11,7 @@ class Post(models.Model):
     tags = models.ManyToManyField('Tag', blank=True, related_name='posts')
     date_pub = models.DateTimeField(auto_now_add=True)
 
-    def qwerty(title):
+    def gen_slug(title):
         new_slug = slugify(title, allow_unicode=True)
         return new_slug + '-' + str(int(time()))
 
@@ -20,7 +20,7 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.id:
-            self.slug = Post.qwerty(self.title)
+            self.slug = Post.gen_slug(self.title)
 
         super().save(*args, **kwargs)
 
@@ -30,10 +30,20 @@ class Post(models.Model):
 
 class Tag(models.Model):
     title = models.CharField(max_length=50)
-    slug = models.SlugField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, blank=True, unique=True)
+
+    def gen_slug(title):
+        new_slug = slugify(title, allow_unicode=True)
+        return new_slug + '-' + str(int(time()))
 
     def get_absolute_url(self):
         return reverse('tag_detail_url', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.slug = Post.gen_slug(self.title)
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
