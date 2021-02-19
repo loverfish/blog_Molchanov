@@ -18,6 +18,9 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('post_detail_url', kwargs={'slug': self.slug})
 
+    def get_update_url(self):
+        return reverse('post_update_url', kwargs={'slug': self.slug})
+
     def save(self, *args, **kwargs):
         if not self.id:
             self.slug = Post.gen_slug(self.title)
@@ -32,18 +35,11 @@ class Tag(models.Model):
     title = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, blank=True, unique=True)
 
-    def gen_slug(title):
-        new_slug = slugify(title, allow_unicode=True)
-        return new_slug + '-' + str(int(time()))
-
     def get_absolute_url(self):
         return reverse('tag_detail_url', kwargs={'slug': self.slug})
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.slug = Post.gen_slug(self.title)
-
-        super().save(*args, **kwargs)
+    def get_update_url(self):
+        return reverse('tag_update_url', kwargs={'slug': self.slug})
 
     def __str__(self):
         return self.title
