@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete "{{obj.title|title|truncatewords:2}}"{% endblock %}
+
+{% block content %}
+    <form action="{{ obj.get_delete_url }}" method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <h2>Are you sure you want to delete '{{obj.title|title}}' {{ name }}?</h2>
+        </div>
+        <a href="{{ obj.get_absolute_url }}" class="btn btn-primary">Cancel</a>
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+{% endblock %}
