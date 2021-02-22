@@ -1,6 +1,6 @@
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.paginator import Paginator
+from django.db.models import Q
 
 from .models import Post, Tag
 from .forms import TagForm, PostForm
@@ -70,28 +70,12 @@ class TagDel(LoginRequiredMixin, ObjectDelMixin, View):
 
 
 def posts_list(request):
-    posts = Post.objects.all()
-    paginator = Paginator(posts, 2)
-    page_number = request.GET.get('page', 1)
-    page = paginator.get_page(page_number)
-
-    is_paginated = page.has_other_pages()
-    if page.has_previous():
-        prev_url = '?page={}'.format(page.previous_page_number())
+    search_query = request.GET.get('search', '')
+    if search_query:
+        posts = Post.objects.filter(Q(title__icontains=search_query) | Q(body__icontains=search_query))
     else:
-        prev_url = ''
-
-    if page.has_next():
-        next_url = '?page={}'.format(page.next_page_number())
-    else:
-        next_url = ''
-
-    context = {
-        'page_object': page,
-        'prev_url': prev_url,
-        'next_url': next_url,
-        'is_paginated': is_paginated,
-    }
+        posts = Post.objects.all()
+    context = pagination(request, posts)
 
     return render(request, 'blog/home.html', context=context)
 
@@ -103,30 +87,8 @@ def tags_list(request):
 
 def tag_detail(request, slug):
     tag = Tag.objects.get(slug__iexact=slug)
-
     posts = tag.posts.all()
-    paginator = Paginator(posts, 2)
-    page_number = request.GET.get('page', 1)
-    page = paginator.get_page(page_number)
-
-    is_paginated = page.has_other_pages()
-    if page.has_previous():
-        prev_url = '?page={}'.format(page.previous_page_number())
-    else:
-        prev_url = ''
-
-    if page.has_next():
-        next_url = '?page={}'.format(page.next_page_number())
-    else:
-        next_url = ''
-
-    context = {
-        'tag': tag,
-        'page_object': page,
-        'prev_url': prev_url,
-        'next_url': next_url,
-        'is_paginated': is_paginated,
-    }
+    context = {'tag': tag, **pagination(request, posts)}
 
     return render(request, 'blog/tag_pag.html', context=context)
 
