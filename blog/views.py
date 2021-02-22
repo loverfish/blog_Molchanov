@@ -1,5 +1,6 @@
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 
 from .models import Post, Tag
 from .forms import TagForm, PostForm
@@ -70,7 +71,29 @@ class TagDel(LoginRequiredMixin, ObjectDelMixin, View):
 
 def posts_list(request):
     posts = Post.objects.all()
-    return render(request, 'blog/home.html', context={'posts': posts})
+    paginator = Paginator(posts, 2)
+    page_number = request.GET.get('page', 1)
+    page = paginator.get_page(page_number)
+
+    is_paginated = page.has_other_pages()
+    if page.has_previous():
+        prev_url = '?page={}'.format(page.previous_page_number())
+    else:
+        prev_url = ''
+
+    if page.has_next():
+        next_url = '?page={}'.format(page.next_page_number())
+    else:
+        next_url = ''
+
+    context = {
+        'page_object': page,
+        'prev_url': prev_url,
+        'next_url': next_url,
+        'is_paginated': is_paginated,
+    }
+
+    return render(request, 'blog/home.html', context=context)
 
 
 def tags_list(request):
@@ -78,9 +101,34 @@ def tags_list(request):
     return render(request, 'blog/tags_list.html', context={'tags': tags})
 
 
-# def tag_detail(request, slug):
-#     tag = Tag.objects.get(slug__iexact=slug)
-#     return render(request, 'blog/tag_detail.html', context={'tag': tag})
+def tag_detail(request, slug):
+    tag = Tag.objects.get(slug__iexact=slug)
+
+    posts = tag.posts.all()
+    paginator = Paginator(posts, 2)
+    page_number = request.GET.get('page', 1)
+    page = paginator.get_page(page_number)
+
+    is_paginated = page.has_other_pages()
+    if page.has_previous():
+        prev_url = '?page={}'.format(page.previous_page_number())
+    else:
+        prev_url = ''
+
+    if page.has_next():
+        next_url = '?page={}'.format(page.next_page_number())
+    else:
+        next_url = ''
+
+    context = {
+        'tag': tag,
+        'page_object': page,
+        'prev_url': prev_url,
+        'next_url': next_url,
+        'is_paginated': is_paginated,
+    }
+
+    return render(request, 'blog/tag_pag.html', context=context)
 
 # def post_detail(request, slug):
 #     post = Post.objects.get(slug__iexact=slug)
