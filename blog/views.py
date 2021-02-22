@@ -1,6 +1,5 @@
-from django.shortcuts import redirect, render
 from django.views.generic import View
-from django.urls import reverse
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Post, Tag
 from .forms import TagForm, PostForm
@@ -17,48 +16,56 @@ class TagDetail(ObjectDetailMixin, View):
     template = 'blog/tag_detail.html'
 
 
-class PostCreate(ObjectCreateMixin, View):
+class PostCreate(LoginRequiredMixin, ObjectCreateMixin, View):
     modelform = PostForm
     template = 'blog/post_create.html'
+    raise_exception = True
 
 
-class TagCreate(ObjectCreateMixin, View):
+class TagCreate(LoginRequiredMixin, ObjectCreateMixin, View):
     modelform = TagForm
     template = 'blog/tag_create.html'
+    raise_exception = True
 
 
-class PostUpdate(ObjectUpdateMixin, View):
+class PostUpdate(LoginRequiredMixin, ObjectUpdateMixin, View):
     model = Post
     modelform = PostForm
     template = 'blog/post_update.html'
+    raise_exception = True
 
 
-class TagUpdate(ObjectUpdateMixin, View):
+class TagUpdate(LoginRequiredMixin, ObjectUpdateMixin, View):
     model = Tag
     modelform = TagForm
     template = 'blog/tag_update.html'
+    raise_exception = True
 
 
-class PostDelete(ObjectDeleteMixin, View):
+class PostDelete(LoginRequiredMixin, ObjectDeleteMixin, View):
     model = Post
     template = 'blog/post_delete.html'
     reverse_template = 'posts_list_url'
+    raise_exception = True
 
 
-class TagDelete(ObjectDeleteMixin, View):
+class TagDelete(LoginRequiredMixin, ObjectDeleteMixin, View):
     model = Tag
     template = 'blog/tag_delete.html'
     reverse_template = 'tags_list_url'
+    raise_exception = True
 
 
-class PostDel(ObjectDelMixin, View):
+class PostDel(LoginRequiredMixin, ObjectDelMixin, View):
     model = Post
     reverse_template = 'posts_list_url'
+    raise_exception = True
 
 
-class TagDel(ObjectDelMixin, View):
+class TagDel(LoginRequiredMixin, ObjectDelMixin, View):
     model = Tag
     reverse_template = 'tags_list_url'
+    raise_exception = True
 
 
 def posts_list(request):
